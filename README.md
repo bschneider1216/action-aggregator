@@ -28,7 +28,7 @@ sample calls above would be:
 ]
 ```
 
-##Approach
+## Approach
 I solved the core problem in Java8 in the `action-aggregator-core` module. The `ActionAggregatorMemoryService` implementation class allows adding actions as a list or single item. Jackson is used to deserialize the incoming json.
 I enjoy the Spock Framework in Groovy for unit testing so built out a more comprehensive test  suite in the `ActionAggregatorMemoryServiceTest.groovy` class. A vanilla JUnit test was provided as well since Groovy was not one of the designated languages
 Concurrent access is supported by java `synchronized` methods
@@ -48,7 +48,7 @@ A future iteration of this project may build out an application with a more dist
 - Groovy and the Spock testing framework for unit tests
 - Application built using Spring Boot, Spring Shell/MVC, Kotlin, and MongoDB
 
-##Run Instructions
+## Run Instructions
 - [install maven](http://maven.apache.org/install.html)
 - [clone project](https://github.com/bschneider1216/action-aggregator.git)
 - in the `action-aggregator` directory, compile the library and execute the unit tests via ```maven clean install```
