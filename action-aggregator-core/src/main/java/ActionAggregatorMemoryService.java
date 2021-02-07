@@ -3,6 +3,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Action;
 import model.ActionStatistic;
+import model.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +16,6 @@ import java.util.stream.Stream;
 
 public class ActionAggregatorMemoryService implements ActionAggregatorService
 {
-   //alternate use of AtomicLong
-
    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
    private final ObjectMapper objectMapper = new ObjectMapper();
@@ -35,7 +34,11 @@ public class ActionAggregatorMemoryService implements ActionAggregatorService
       }
       catch (JsonProcessingException e)
       {
-         logger.error("Unable to deserialize list. Actions will not be added", e);
+         logger.error("Unable to deserialize json input. Actions will not be added", e);
+      }
+      catch (Exception e)
+      {
+         logger.error("Exception Processing json input. Actions will not be added", e);
       }
    }
 
@@ -54,12 +57,18 @@ public class ActionAggregatorMemoryService implements ActionAggregatorService
       {
          logger.error("Unable to deserialize list. Actions will not be added", e);
       }
+      catch (Exception e)
+      {
+         logger.error("Exception Processing json input. Actions will not be added", e);
+      }
    }
 
    private synchronized void updateTimesAndStats(List<Action> actions)
    {
+      //Group action list by action type
       actions.stream().collect(Collectors.groupingBy(Action::getAction))
             .forEach((key, actionsByType) -> {
+               //either update the item entry or insert new entry
                if (actionTimes.containsKey(key))
                {
                   List<Long> times = Stream.concat(actionTimes.get(key).stream(), actionsByType.stream().map(Action::getTime)).collect(Collectors.toList());
@@ -69,6 +78,7 @@ public class ActionAggregatorMemoryService implements ActionAggregatorService
                {
                   actionTimes.put(key, actionsByType.stream().map(Action::getTime).collect(Collectors.toList()));
                }
+
                updateStats(key);
             });
    }
@@ -100,11 +110,11 @@ public class ActionAggregatorMemoryService implements ActionAggregatorService
    public String getStats()
    {
       List<ActionStatistic> actionStatistics = actionStats.entrySet().stream().map(entrySet -> {
-         ActionStatistic as = new ActionStatistic();
-         as.setAction(entrySet.getKey());
-         as.setAvg(entrySet.getValue().getAverage());
+         ActionStatistic actionStatistic = new ActionStatistic();
+         actionStatistic.setAction(entrySet.getKey());
+         actionStatistic.setAvg(entrySet.getValue().getAverage());
 
-         return as;
+         return actionStatistic;
       }).collect(Collectors.toList());
 
       try
