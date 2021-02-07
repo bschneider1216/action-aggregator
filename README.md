@@ -1,6 +1,6 @@
 # Action Aggregator Project
 
-##Assignment
+## Assignment
 The assignment is to write a small library class that can perform the following operations:
 
 ### Add Action
